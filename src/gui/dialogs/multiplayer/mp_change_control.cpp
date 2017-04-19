@@ -32,7 +32,7 @@
 #include "formula/string_utils.hpp"
 #include "game_board.hpp"
 #include "game_display.hpp"
-#include "game_preferences.hpp"
+#include "credentials.hpp"
 #include "log.hpp"
 #include "resources.hpp"
 #include "team.hpp"

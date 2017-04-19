@@ -28,6 +28,7 @@
 #include "chat_command_handler.hpp"
 #include "config_assign.hpp"
 #include "construct_dialog.hpp"
+#include "credentials.hpp"
 #include "display_chat_manager.hpp"
 #include "formatter.hpp"
 #include "formula/string_utils.hpp"
