@@ -205,11 +205,11 @@ function wml_actions.objectives(cfg)
 end
 
 function wml_actions.show_objectives(cfg)
-	local cfg0 = scenario_objectives[0]
+	local cfg0 = helper.parsed(scenario_objectives[0])
 	local function local_show_objectives(sides)
 		local objectives0 = cfg0 and generate_objectives(cfg0)
 		for i, team in ipairs(sides) do
-			cfg = scenario_objectives[team.side]
+			cfg = helper.parsed(scenario_objectives[team.side])
 			local objectives = (cfg and generate_objectives(cfg)) or objectives0
 			if objectives then team.objectives = objectives end
 			team.objectives_changed = true
