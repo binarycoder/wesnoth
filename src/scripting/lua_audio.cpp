@@ -20,6 +20,7 @@ See the COPYING file for more details.
 #include "sound_music_track.hpp"
 #include "config_assign.hpp"
 #include "preferences.hpp"
+#include <set>
 
 static const char* Track = "music track";
 
@@ -80,8 +81,13 @@ static int impl_music_get(lua_State* L) {
 
 static int impl_music_set(lua_State* L) {
 	if(lua_isnumber(L, 2)) {
-		music_track& track = *get_track(L, 3);
-		sound::set_track(lua_tointeger(L, 2), *track);
+		int i = lua_tointeger(L, 2) - 1;
+		if(lua_isnil(L, 3)) {
+			sound::remove_track(i);
+		} else {
+			music_track& track = *get_track(L, 3);
+			sound::set_track(i, *track);
+		}
 		return 0;
 	}
 	const char* m = luaL_checkstring(L, 2);
@@ -132,6 +138,18 @@ static int intf_music_add(lua_State* L) {
 
 static int intf_music_clear(lua_State*) {
 	sound::empty_playlist();
+	return 0;
+}
+
+static int intf_music_remove(lua_State* L) {
+	// Use a non-standard comparator to ensure iteration in descending order
+	std::set<int, std::greater<int>> to_remove;
+	for(int i = 1; i <= lua_gettop(L); i++) {
+		to_remove.insert(luaL_checkinteger(L, i));
+	}
+	for(int i : to_remove) {
+		sound::remove_track(i);
+	}
 	return 0;
 }
 
@@ -204,6 +222,7 @@ namespace lua_audio {
 			{ "play", intf_music_play },
 			{ "add", intf_music_add },
 			{ "clear", intf_music_clear },
+			{ "remove", intf_music_remove },
 			{ "force_refresh", intf_music_commit },
 			{ nullptr, nullptr },
 		};

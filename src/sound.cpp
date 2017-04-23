@@ -190,6 +190,21 @@ namespace sound {
 			current_track_list[i] = to;
 		}
 	}
+
+	void remove_track(unsigned int i) {
+		if(i >= current_track_list.size()) {
+			return;
+		}
+		if(i == current_track_index) {
+			// Let the track finish playing
+			current_track.set_play_once(true);
+			// Set current index to the new size of the list
+			current_track_index = current_track_list.size() - 1;
+		} else if(i < current_track_index) {
+			current_track_index--;
+		}
+		current_track_list.erase(current_track_list.begin() + i);
+	}
 }
 
 static bool track_ok(const std::string& id)

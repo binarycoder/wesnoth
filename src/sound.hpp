@@ -105,6 +105,7 @@ void set_UI_volume(int vol);
 
 unsigned int get_current_track();
 unsigned int get_num_tracks();
+void remove_track(unsigned int i);
 
 }
 
