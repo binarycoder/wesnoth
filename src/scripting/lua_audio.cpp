@@ -62,7 +62,15 @@ static int impl_music_get(lua_State* L) {
 		push_track(L, sound::get_current_track());
 		return 1;
 	}
-	return_int_attrib("current_i", sound::get_current_track() + 1);
+	if(strcmp(m, "current_i") == 0) {
+		size_t i = sound::get_current_track();
+		if(i == sound::get_num_tracks()) {
+			lua_pushnil(L);
+		} else {
+			lua_pushinteger(L, i + 1);
+		}
+		return 1;
+	}
 	return luaW_getmetafield(L, 1, m);
 }
 
