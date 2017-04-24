@@ -598,15 +598,17 @@ void play_music_config(const config &music_node, int i)
 		current_track_list.clear();
 	}
 
+	auto iter = current_track_list.end();
 	if(track.valid()) {
 		// Avoid 2 tracks with the same name, since that can cause an infinite loop
 		// in choose_track(), 2 tracks with the same name will always return the
 		// current track and track_ok() doesn't allow that.
 		if(std::find(current_track_list.begin(), current_track_list.end(), track) == current_track_list.end()) {
 			if(i < 0 || static_cast<size_t>(i) >= current_track_list.size()) {
-				current_track_list.push_back(track);
+				current_track_list.emplace_back(track);
+				iter = current_track_list.end() - 1;
 			} else {
-				current_track_list.insert(current_track_list.begin() + 1, track);
+				iter = current_track_list.emplace(current_track_list.begin() + 1, track);
 				if(current_track_index >= static_cast<size_t>(i)) {
 					current_track_index++;
 				}
@@ -618,8 +620,8 @@ void play_music_config(const config &music_node, int i)
 
 	// They can tell us to start playing this list immediately.
 	if (track.immediate()) {
-		current_track = track;
-		current_track_index = current_track_list.size() - 1;
+		current_track = *iter;
+		current_track_index = iter - current_track_list.begin();
 		play_music();
 	} else if (!track.append()) { // Make sure the current track is finished
 		current_track.set_play_once(true);
