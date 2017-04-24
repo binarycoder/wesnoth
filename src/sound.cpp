@@ -521,6 +521,16 @@ void play_music()
 	fadingout_time = current_track->ms_after();
 }
 
+void play_track(unsigned int i) {
+	if(i >= current_track_list.size()) {
+		current_track = choose_track();
+	} else {
+		current_track_index = i;
+		current_track = current_track_list[i];
+	}
+	play_music();
+}
+
 static void play_new_music()
 {
 	music_start_time = 0; //reset status: no start time
