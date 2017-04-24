@@ -577,7 +577,7 @@ void play_music_repeatedly(const std::string &id)
 	}
 }
 
-void play_music_config(const config &music_node)
+void play_music_config(const config &music_node, int i)
 {
 	music_track track( music_node );
 
@@ -609,7 +609,14 @@ void play_music_config(const config &music_node)
 		}
 
 		if(itor == current_track_list.end()) {
-			current_track_list.push_back(track);
+			if(i < 0 || static_cast<size_t>(i) >= current_track_list.size()) {
+				current_track_list.push_back(track);
+			} else {
+				current_track_list.insert(current_track_list.begin() + 1, track);
+				if(current_track_index >= static_cast<size_t>(i)) {
+					current_track_index++;
+				}
+			}
 		} else {
 			ERR_AUDIO << "tried to add duplicate track '" << track.file_path() << "'" << std::endl;
 		}
