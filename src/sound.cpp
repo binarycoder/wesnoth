@@ -602,13 +602,7 @@ void play_music_config(const config &music_node, int i)
 		// Avoid 2 tracks with the same name, since that can cause an infinite loop
 		// in choose_track(), 2 tracks with the same name will always return the
 		// current track and track_ok() doesn't allow that.
-		std::vector<music_track>::const_iterator itor = current_track_list.begin();
-		while(itor != current_track_list.end()) {
-			if(track == *itor) break;
-			++itor;
-		}
-
-		if(itor == current_track_list.end()) {
+		if(std::find(current_track_list.begin(), current_track_list.end(), track) == current_track_list.end()) {
 			if(i < 0 || static_cast<size_t>(i) >= current_track_list.size()) {
 				current_track_list.push_back(track);
 			} else {
