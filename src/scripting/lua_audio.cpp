@@ -101,7 +101,7 @@ static int impl_music_set(lua_State* L) {
 		return 0;
 	}
 	const char* m = luaL_checkstring(L, 2);
-	modify_float_attrib_check_range("volume", sound::set_music_volume(value * preferences::music_volume() / 100.0f), 0.0, 100.0)
+	modify_float_attrib_check_range("volume", sound::set_music_volume(value * preferences::music_volume() / 100.0f), 0.0, 100.0);
 	// TODO: Set "current" and "current_i"
 	return 0;
 }
