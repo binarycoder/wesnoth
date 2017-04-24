@@ -82,8 +82,18 @@ static int impl_music_get(lua_State* L) {
 static int impl_music_set(lua_State* L) {
 	if(lua_isnumber(L, 2)) {
 		int i = lua_tointeger(L, 2) - 1;
+		config cfg;
 		if(lua_isnil(L, 3)) {
 			sound::remove_track(i);
+		} else if(luaW_toconfig(L, 3, cfg)) {
+			// Don't allow play_once=yes
+			if(cfg["play_once"]) {
+				return luaL_argerror(L, 3, "For play_once, use wesnoth.music_list.play instead");
+			}
+			// Remove the track at that index and add the new one in its place
+			// It's a little inefficient though...
+			sound::remove_track(i);
+			sound::play_music_config(cfg, i);
 		} else {
 			music_track& track = *get_track(L, 3);
 			sound::set_track(i, *track);
