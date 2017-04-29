@@ -191,10 +191,10 @@ namespace {
 	};
 
 	typedef std::pair<unsigned, unsigned> resolution;
-	typedef std::vector<std::pair<unsigned, unsigned> > tresolution_list;
+	typedef std::vector<std::pair<unsigned, unsigned> > resolution_list;
 
 	template<class T>
-	void test_resolutions(const tresolution_list& resolutions)
+	void test_resolutions(const resolution_list& resolutions)
 	{
 		for(const resolution& resolution : resolutions) {
 			CVideo& video = test_utils::get_fake_display(resolution.first, resolution.second).video();
@@ -231,7 +231,7 @@ namespace {
 	}
 
 	template<class T>
-	void test_popup_resolutions(const tresolution_list& resolutions)
+	void test_popup_resolutions(const resolution_list& resolutions)
 	{
 		bool interact = false;
 		for(int i = 0; i < 2; ++i) {
@@ -279,7 +279,7 @@ namespace {
 #pragma warning(push)
 #pragma warning(disable: 4702)
 #endif
-	void test_tip_resolutions(const tresolution_list& resolutions
+	void test_tip_resolutions(const resolution_list& resolutions
 			, const std::string& id)
 	{
 		for(const resolution& resolution : resolutions) {
@@ -322,15 +322,15 @@ namespace {
 #pragma warning(pop)
 #endif
 
-const tresolution_list& get_gui_resolutions()
+const resolution_list& get_gui_resolutions()
 {
-	static tresolution_list result;
-	if(result.empty()) {
-		result.push_back(std::make_pair(800, 600));
-		result.push_back(std::make_pair(1024, 768));
-		result.push_back(std::make_pair(1280, 1024));
-		result.push_back(std::make_pair(1680, 1050));
-	}
+	static resolution_list result {
+		{800,  600},
+		{1024, 768},
+		{1280, 1024},
+		{1680, 1050},
+	};
+
 	return result;
 }
 
@@ -339,13 +339,13 @@ void test()
 {
 	gui2::new_widgets = false;
 
-	for(size_t i = 0; i < 2; ++i) {
+//	for(size_t i = 0; i < 2; ++i) {
 
 		test_resolutions<T>(get_gui_resolutions());
 
-		break; // FIXME: New widgets break
-		gui2::new_widgets = true;
-	}
+//		break; // FIXME: New widgets break
+//		gui2::new_widgets = true;
+//	}
 }
 
 template<class T>
@@ -440,7 +440,7 @@ BOOST_AUTO_TEST_CASE(test_gui2)
 	//test<lua_interpreter>(& lua_kernel_base());
 	test<message>();
 	test<mp_alerts_options>();
-	test<mp_change_control>();
+	//test<mp_change_control>();
 	test<mp_cmd_wrapper>();
 	test<mp_connect>();
 	//test<mp_create_game>();
@@ -518,6 +518,7 @@ BOOST_AUTO_TEST_CASE(test_gui2)
 		"help_browser",
 		"story_viewer",
 		"outro",
+		"mp_change_control", // Basically useless without a game_board object, so disabling
 	};
 	std::sort(list.begin(), list.end());
 	std::sort(omitted.begin(), omitted.end());
@@ -893,7 +894,7 @@ struct dialog_tester<message>
 		return new message("Title", "Message", false, false);
 	}
 };
-
+#if 0
 template<>
 struct dialog_tester<mp_change_control>
 {
@@ -902,7 +903,7 @@ struct dialog_tester<mp_change_control>
 		return new mp_change_control(nullptr);
 	}
 };
-
+#endif
 template<>
 struct dialog_tester<mp_cmd_wrapper>
 {
@@ -936,23 +937,23 @@ struct dialog_tester<mp_join_game_password_prompt>
 	}
 };
 
+static std::vector<std::string> depcheck_mods {"mod_one", "some other", "more"};
+
 template<>
 struct dialog_tester<depcheck_confirm_change>
 {
-	std::vector<std::string> mods {"mod_one", "some other", "more"};
 	depcheck_confirm_change* create()
 	{
-		return new depcheck_confirm_change(true, mods, "requester");
+		return new depcheck_confirm_change(true, depcheck_mods, "requester");
 	}
 };
 
 template<>
 struct dialog_tester<depcheck_select_new>
 {
-	std::vector<std::string> mods {"mod_one", "some other", "more"};
 	depcheck_select_new* create()
 	{
-		return new depcheck_select_new(ng::depcheck::MODIFICATION, mods);
+		return new depcheck_select_new(ng::depcheck::MODIFICATION, depcheck_mods);
 	}
 };
 
@@ -986,7 +987,7 @@ struct dialog_tester<screenshot_notification>
 template<>
 struct dialog_tester<theme_list>
 {
-	theme_info make_theme(std::string name)
+	static theme_info make_theme(std::string name)
 	{
 		theme_info ti;
 		ti.id = name;
@@ -994,12 +995,13 @@ struct dialog_tester<theme_list>
 		ti.description = name + " this is a description";
 		return ti;
 	}
-	std::vector<theme_info> themes {make_theme("classic"), make_theme("new"), make_theme("more"), make_theme("themes")};
+	static std::vector<theme_info> themes;
 	theme_list* create()
 	{
 		return new theme_list(themes, 0);
 	}
 };
+std::vector<theme_info> dialog_tester<theme_list>::themes {make_theme("classic"), make_theme("new"), make_theme("more"), make_theme("themes")};
 
 template<>
 struct dialog_tester<editor_generate_map>
@@ -1112,12 +1114,13 @@ struct dialog_tester<title_screen>
 template<>
 struct dialog_tester<wml_error>
 {
-	std::vector<std::string> files {"some", "files", "here"};
+	static std::vector<std::string> files;
 	wml_error* create()
 	{
 		return new wml_error("Summary", "Post summary", files, "Details");
 	}
 };
+std::vector<std::string> dialog_tester<wml_error>::files {"some", "files", "here"};
 
 template<>
 struct dialog_tester<wml_message_left>

@@ -876,7 +876,7 @@ static std::vector<std::string> parse_commandline_arguments(std::string input)
 
 	while(parse_commandline_argument(start, end, buffer))
 	{
-		res.push_back(std::string());
+		res.emplace_back();
 		res.back().swap(buffer);
 	}
 	return res;
@@ -1014,6 +1014,8 @@ int main(int argc, char** argv)
 
 	//declare this here so that it will always be at the front of the event queue.
 	events::event_context global_context;
+
+	SDL_StartTextInput();
 
 	try {
 		std::cerr << "Battle for Wesnoth v" << game_config::revision << '\n';
